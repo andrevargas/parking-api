@@ -1,0 +1,23 @@
+{
+  "name": "TrackingKey",
+  "plural": "tracking_key",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "device_id": {
+      "type": "number",
+      "required": true
+    },
+    "tracking_key": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
