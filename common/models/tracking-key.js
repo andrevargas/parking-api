@@ -16,8 +16,8 @@ module.exports = function(TrackingKey) {
 	TrackingKey.getKey = function(deviceId, cb) {
 		
 		var ds = TrackingKey.app.datasources.postgresqlDs;
-		var sql = "SELECT get_tracking_key($1) as tracking_key";
-		ds.connector.execute(sql, [deviceId], function(err, trackingKey){
+		var sql = "SELECT get_tracking_key($1) AS key";
+		ds.connector.query(sql, [deviceId], function(err, trackingKey){
 			 cb(err, trackingKey);
 		});
 	  	
@@ -27,7 +27,7 @@ module.exports = function(TrackingKey) {
         'getKey', 
         {
           accepts: {arg: 'device_id', type: 'number'},
-          returns: {type: 'string', root: false},
+          returns: {arg: 'key', type: 'string', root: true},
           http: {verb: 'get', path: '/:device_id'}
         }
     );

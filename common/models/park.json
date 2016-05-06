@@ -1,0 +1,27 @@
+{
+  "name": "Park",
+  "plural": "park",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "pricePerMinute": {
+      "type": "number",
+      "required": true
+    },
+    "area": {
+      "type": "geopoint",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

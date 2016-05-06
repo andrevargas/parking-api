@@ -35,5 +35,9 @@
   "TrackingKey": {
     "dataSource": "postgresqlDs",
     "public": true
+  },
+  "Park": {
+    "dataSource": "postgresqlDs",
+    "public": true
   }
 }
