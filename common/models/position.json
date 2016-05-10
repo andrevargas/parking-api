@@ -1,0 +1,23 @@
+{
+  "name": "Position",
+  "plural": "position",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "trackingKey": {
+      "type": "number",
+      "required": true
+    },
+    "position": {
+      "type": "object",
+      "required": true 
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

@@ -39,5 +39,13 @@
   "Park": {
     "dataSource": "postgresqlDs",
     "public": true
+  },
+  "Position": {
+    "dataSource": "postgresqlDs",
+    "public": true
+  },
+  "PositionType": {
+    "dataSource": "postgresqlDs",
+    "public": false
   }
 }

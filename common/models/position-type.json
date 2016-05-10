@@ -1,0 +1,29 @@
+{
+  "name": "PositionType",
+  "idInjection": false,
+  "base": "TransientModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "lat": {
+      "type": "string",
+      "required": true
+    },
+    "long": {
+      "type": "string",
+      "required": true
+    },
+    "accuracy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

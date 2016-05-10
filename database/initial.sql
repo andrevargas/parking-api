@@ -3,9 +3,8 @@
 
 CREATE TABLE tracking_key
 (
-  device_id integer PRIMARY KEY,
-  key_number character(5) NOT NULL,
-  id serial NOT NULL
+  key_number character(5) NOT NULL PRIMARY KEY,
+  device_id integer
 );
 
 CREATE SEQUENCE tracking_key_number_seq
@@ -28,7 +27,7 @@ $BODY$
 			RETURN tkey;
 		ELSE
 			tkey := to_char(nextval('tracking_key_number_seq'), 'FM00000');
-			INSERT INTO tracking_key (device_id, key_number) VALUES (device, tkey);
+			INSERT INTO tracking_key (key_number, device_id) VALUES (tkey, device);
 			RETURN tkey;
 		END IF;
 	END
@@ -49,8 +48,34 @@ CREATE TYPE park_detail AS (
 	distance decimal(10,2)
 );
 
--- CREATE OR REPLACE FUNCTION get_parks(lat number long number) RETURNS setof park_detail AS
--- $BODY$
-	
--- $BODY$
--- 	LANGUAGE plpgsql;
+-- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento da Fundação Cultural de Brusque', 0.10, 
+-- st_geomfromtext('POLYGON((-27.098500 -48.913904, -27.098510 -48.913565, -27.098705 -48.913574, -27.098696 -48.913908, -27.098500 -48.913904))', 4326));
+
+CREATE TABLE position (
+	id serial PRIMARY KEY,
+	tracking_key_number char(5) NOT NULL,
+	point_date timestamp NOT NULL,
+	accurracy decimal(10,2)
+);
+
+ALTER TABLE position ADD FOREIGN KEY (tracking_key_number) REFERENCES tracking_key(key_number);
+
+SELECT addgeometrycolumn('position', 'actual_location', 4326, 'POINT', 2);
+
+CREATE OR REPLACE FUNCTION get_actual_park(lat numeric, long numeric) RETURNS json AS
+$BODY$
+	DECLARE
+		park RECORD;
+	BEGIN
+		FOR park IN (SELECT * FROM park) LOOP
+			IF st_within(
+				st_geomfromtext('POINT(' || lat || ' ' || long ')', 4326),
+				park.area
+			) THEN RETURN json_build_object('currentPark', park.name);
+			END IF
+		END LOOP
+	END
+$BODY$
+	LANGUAGE plpgsql;
+
+-- SELECT get_actual_park(-27.0986, -48.913905);

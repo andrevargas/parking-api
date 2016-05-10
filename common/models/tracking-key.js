@@ -14,13 +14,13 @@ module.exports = function(TrackingKey) {
 	TrackingKey.disableRemoteMethod('count', true);
 
 	TrackingKey.getKey = function(deviceId, cb) {
-		
+
 		var ds = TrackingKey.app.datasources.postgresqlDs;
 		var sql = "SELECT get_tracking_key($1) AS key";
 		ds.connector.query(sql, [deviceId], function(err, trackingKey){
-			 cb(err, trackingKey);
+			cb(err, trackingKey[0]);
 		});
-	  	
+
     };
      
     TrackingKey.remoteMethod(
