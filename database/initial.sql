@@ -62,18 +62,20 @@ ALTER TABLE position ADD FOREIGN KEY (tracking_key_number) REFERENCES tracking_k
 
 SELECT addgeometrycolumn('position', 'actual_location', 4326, 'POINT', 2);
 
-CREATE OR REPLACE FUNCTION get_actual_park(lat numeric, long numeric) RETURNS json AS
+CREATE OR REPLACE FUNCTION get_actual_park(latitude numeric, longitude numeric) RETURNS json AS
 $BODY$
 	DECLARE
 		park RECORD;
+		park_name varchar := null;
 	BEGIN
 		FOR park IN (SELECT * FROM park) LOOP
 			IF st_within(
-				st_geomfromtext('POINT(' || lat || ' ' || long ')', 4326),
+				st_geomfromtext('POINT(' || latitude || ' ' || longitude ')', 4326),
 				park.area
-			) THEN RETURN json_build_object('currentPark', park.name);
-			END IF
-		END LOOP
+			) THEN park_name := park.name;
+			END IF;
+		END LOOP;
+		RETURN json_build_object('currentPark', park_name, 'absoluteSpeed', 40);
 	END
 $BODY$
 	LANGUAGE plpgsql;
