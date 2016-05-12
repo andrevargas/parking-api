@@ -16,10 +16,15 @@ module.exports = function(Park) {
 	Park.getAll = function(trackingKey, lat, long, cb) {
 		var ds = Park.app.datasources.postgresqlDs;
 		var sql = "SELECT get_all_parks($1, $2, $3) as parks";
+
 		ds.connector.query(sql, [trackingKey, lat, long], function(err, data){
-			cb(err, data)
+			var parks = Array();
+			for (item in data){
+				parks.push(data[item].parks);
+			}
+			cb(err, parks);
     	});
-	}
+	};
 
 	Park.remoteMethod(
         'getAll', 

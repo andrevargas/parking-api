@@ -50,6 +50,9 @@ CREATE TYPE park_detail AS (
 
 -- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento da Fundação Cultural de Brusque', 0.10, 
 -- st_geomfromtext('POLYGON((-48.913904 -27.098500, -48.913565 -27.098510, -48.913574 -27.098705, -48.913908 -27.098696, -48.913904 -27.098500))', 4326));
+-- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento UNIVALI Bloco D', 1.00, 
+-- st_geomfromtext('POLYGON((-48.664035 -26.915879, -48.663418 -26.915736, -48.663370 -26.915872, -48.663989 -26.916025, -48.664035 -26.915879
+-- ))', 4326));
 
 CREATE TABLE position (
 	id serial PRIMARY KEY,
