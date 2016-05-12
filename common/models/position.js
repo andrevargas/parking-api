@@ -13,9 +13,10 @@ module.exports = function(Position) {
 	Position.disableRemoteMethod('prototype.updateAttributes', true);
 	Position.disableRemoteMethod('count', true);
 
+	var moment = require('moment');
+
 	Position.sendPosition = function(trackingKey, position, cb) {
 		
-		var moment = require('moment');
 		var momentDate = moment(position.date).format('YYYY-MM-DD HH:mm:ss');
 
 		var ds = Position.app.datasources.postgresqlDs;
@@ -44,6 +45,37 @@ module.exports = function(Position) {
           	],
           	returns: {arg: 'actualPark', type: 'object', root: true},
           	http: {verb: 'post', path: '/:tracking_key'}
+        }
+    );
+
+    Position.getPosition = function(trackingKey, cb) {
+		
+		var ds = Position.app.datasources.postgresqlDs;
+		var sql = "SELECT get_actual_position($1) as position";
+		ds.connector.query(sql, [trackingKey], function(err, data){
+			if(err){
+				cb(err);
+			}
+			var location = {
+				currentPark: data[0].position.currentPark,
+				date: moment(data[0].position.date).format('YYYY-MM-DD HH:mm:ss'),
+				position: {
+					latitude: data[0].position.latitude,
+					longitude: data[0].position.longitude,
+					accuracy: data[0].position.accuracy
+				}
+			};
+			console.log(location);
+			cb(err, location)
+    	});
+	};
+
+	Position.remoteMethod(
+        'getPosition', 
+    	{
+          	accepts: {arg: 'tracking_key', type: 'string'},
+          	returns: {arg: 'position', type: 'object', root: true},
+          	http: {verb: 'get', path: '/:tracking_key'}
         }
     );
 

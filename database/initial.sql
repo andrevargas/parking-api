@@ -81,3 +81,30 @@ $BODY$
 	LANGUAGE plpgsql;
 
 -- SELECT get_actual_park(-27.0986, -48.913905);
+
+CREATE OR REPLACE FUNCTION get_actual_position(tracking_key varchar) RETURNS json AS
+$BODY$
+	DECLARE
+		current_position RECORD;
+		park RECORD;
+		park_name varchar := null;
+	BEGIN
+		SELECT * INTO current_position FROM position WHERE tracking_key_number = tracking_key ORDER BY point_date DESC LIMIT 1;
+		FOR park IN (SELECT * FROM park) LOOP
+			IF st_within(
+				current_position.actual_location,
+				park.area
+			) THEN park_name := park.name;
+			END IF;
+		END LOOP;
+		RETURN json_build_object(
+			'currentPark', park_name, 
+			'date', current_position.point_date, 
+			'latitude', st_y(current_position.actual_location), 
+			'longitude', st_x(current_position.actual_location), 
+			'accuracy', current_position.accuracy
+		);
+	END
+$BODY$
+	LANGUAGE plpgsql;
+
