@@ -22,7 +22,7 @@ module.exports = function(Position) {
 		var ds = Position.app.datasources.postgresqlDs;
 
 		var sql = "INSERT INTO position (tracking_key_number, point_date, accuracy, actual_location) VALUES ($1, $2, $3, $4)";
-		var point = "SRID=4326;POINT(" + position.lat + " " + position.long + ")";
+		var point = "SRID=4326;POINT(" + position.long + " " + position.lat + ")";
 		ds.connector.query(sql, [trackingKey, momentDate, position.accuracy, point], function(err){
 			if(err){
 				cb(err);

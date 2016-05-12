@@ -49,7 +49,7 @@ CREATE TYPE park_detail AS (
 );
 
 -- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento da Fundação Cultural de Brusque', 0.10, 
--- st_geomfromtext('POLYGON((-27.098500 -48.913904, -27.098510 -48.913565, -27.098705 -48.913574, -27.098696 -48.913908, -27.098500 -48.913904))', 4326));
+-- st_geomfromtext('POLYGON((-48.913904 -27.098500, -48.913565 -27.098510, -48.913574 -27.098705, -48.913908 -27.098696, -48.913904 -27.098500))', 4326));
 
 CREATE TABLE position (
 	id serial PRIMARY KEY,
@@ -70,7 +70,7 @@ $BODY$
 	BEGIN
 		FOR park IN (SELECT * FROM park) LOOP
 			IF st_within(
-				st_geomfromtext('POINT(' || latitude || ' ' || longitude ')', 4326),
+				st_geomfromtext('POINT(' || longitude || ' ' || latitude ')', 4326),
 				park.area
 			) THEN park_name := park.name;
 			END IF;
@@ -108,3 +108,15 @@ $BODY$
 $BODY$
 	LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_all_parks(tracking_key varchar, latitude numeric, longitude numeric) RETURNS setof json AS
+$BODY$
+	DECLARE
+		park RECORD;
+		json_object json;
+	BEGIN
+		FOR park IN (SELECT *, (st_distance_sphere(st_geomfromtext('POINT('|| longitude || ' ' ||  latitude ||')', 4326), area)) AS distance FROM park ORDER BY distance ASC) LOOP
+			RETURN NEXT json_build_object('park', park.name, 'pricePerMinute', park.price_per_minute, 'distance', park.distance);
+		END LOOP;
+	END
+$BODY$
+	LANGUAGE plpgsql;

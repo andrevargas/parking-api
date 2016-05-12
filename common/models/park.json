@@ -1,6 +1,6 @@
 {
   "name": "Park",
-  "plural": "park",
+  "plural": "parkings",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
