@@ -42,12 +42,6 @@ CREATE TABLE park (
 
 SELECT addgeometrycolumn('park', 'area', 4326, 'POLYGON', 2);
 
-CREATE TYPE park_detail AS (
-	park varchar(255),
-	price_per_minute decimal(10,2),
-	distance decimal(10,2)
-);
-
 -- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento da Fundação Cultural de Brusque', 0.10, 
 -- st_geomfromtext('POLYGON((-48.913904 -27.098500, -48.913565 -27.098510, -48.913574 -27.098705, -48.913908 -27.098696, -48.913904 -27.098500))', 4326));
 -- INSERT INTO park (name, price_per_minute, area) VALUES ('Estacionamento UNIVALI Bloco D', 1.00, 
@@ -123,3 +117,39 @@ $BODY$
 	END
 $BODY$
 	LANGUAGE plpgsql;
+
+CREATE TABLE transaction (
+	id serial PRIMARY KEY,
+	id_park integer not null,
+	tracking_key_number char(5) not null,
+	date_in timestamp,
+	date_out timestamp
+);
+
+ALTER TABLE transaction ADD FOREIGN KEY (id_park) REFERENCES park(id);
+ALTER TABLE transaction ADD FOREIGN KEY (tracking_key_number) REFERENCES tracking_key(key_number);
+
+CREATE OR REPLACE FUNCTION update_financial_transactions() RETURNS trigger AS
+$BODY$
+	DECLARE
+		park RECORD;
+		park_id integer := null;
+	BEGIN
+
+		FOR park INTO (SELECT * FROM park) LOOP
+			IF st_within(
+				NEW.actual_location,
+				park.area
+			) THEN park_id := park.id;
+			END IF;
+		END LOOP;
+
+		IF (SELECT * FROM transaction WHERE tracking_key_number = NEW.tracking_key_number) IS NULL THEN
+			INSERT INTO transaction (id_park, tracking_key_number, date_in) VALUES (park_id, NEW.tracking_key_number, NEW.point_date);
+		ELSE
+			UPDATE transaction SET date_out = NEW.point_date WHERE tracking_key_number = NEW.tracking_key_number;
+		END IF;
+	END
+$BODY$
+	LANGUAGE plpgsql;
+
